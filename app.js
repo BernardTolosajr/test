@@ -21,7 +21,7 @@ app.get('/auth/:authId', (req, res) => {
 
       res.json({
         authCode: req.params.authId,
-        games: response.data,
+        // games: response.data,
       });
     })
     .catch(function (error) {
