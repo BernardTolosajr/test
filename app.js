@@ -10,26 +10,35 @@ app.get('/', (req, res) => {
 });
 
 app.get('/auth/:authId', (req, res) => {
-  console.log(req.params);
+  // let config = {
+  //   headers: {
+  //     'Client-Id': 2022030313304100083286,
+  //     signature: `algorith=RSA256,keyVersion=1,signature=${signature}`,
+  //     'Content-Type': application / json,
+  //     'Request-Time': new Date().toISOString(),
+  //   },
+  // };
+
+  let data = {
+    referenceClientId: '2022030313304100083286',
+    grantType: 'AUTHORIZATION_CODE',
+    authCode: req.params.authId,
+    extendInfo: '{"pointwestmp-sit":"GCASH"}',
+  };
 
   axios
-    // .get('https://www.pointwestmp-sit.com.ph')
-    .get('https://api.sampleapis.com/switch/games')
+    .post('pointwestmp-sit.com.ph/v1/customer/user/inquiryUserInfoByAccessToken', data)
+    // .get('pointwestmp-sit.com.ph/v1/oauths/applyToken', data, config)
     .then(function (response) {
-      // handle success
-      // console.log(response.data);
-
-      res.json({
+      console.log(response.data);
+      res.status(200).json({
         authCode: req.params.authId,
+        response: response,
         // games: response.data,
       });
     })
     .catch(function (error) {
-      // handle error
       console.log(error);
-    })
-    .then(function () {
-      // always executed
     });
 });
 
@@ -38,3 +47,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Listening to port 3000');
 });
+
+//POST pointwestmp-sit.com.ph/v1/oauths/applyToken
