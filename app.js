@@ -19,16 +19,23 @@ app.get('/auth/:authId', (req, res) => {
   //     'Request-Time': new Date().toISOString(),
   //   },
   // };
+  const clientID = '2022030313304100083286';
+  const signature = '';
 
   let data = {
-    referenceClientId: '2022030313304100083286',
+    // referenceClientId: '2022030313304100083286',
+    // grantType: 'AUTHORIZATION_CODE',
+    // authCode: req.params.authId,
+    // extendInfo: '{"pointwestmp-sit":"GCASH"}',
     grantType: 'AUTHORIZATION_CODE',
     authCode: req.params.authId,
-    extendInfo: '{"pointwestmp-sit":"GCASH"}',
   };
 
+  console.log('data', data);
+
   axios
-    .post('pointwestmp-sit.com.ph/v1/customer/user/inquiryUserInfoByAccessToken', data)
+    // .post('pointwestmp-sit.com.ph/v1/customer/user/inquiryUserInfoByAccessToken', data)
+    .post('pointwestmp-sit.com.ph/v1/authorizations/applyToken', data)
     // .get('pointwestmp-sit.com.ph/v1/oauths/applyToken', data, config)
     .then(function (response) {
       // console.log(response.data);
