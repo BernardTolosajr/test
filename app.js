@@ -39,6 +39,10 @@ app.get('/auth/:authId', (req, res) => {
     })
     .catch(function (error) {
       console.log(error);
+      res.status(400).json({
+        authCode: req.params.authId,
+        response: error,
+      });
       // console.log('error');
     });
 });
