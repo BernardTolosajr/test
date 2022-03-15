@@ -30,15 +30,16 @@ app.get('/auth/:authId', (req, res) => {
     .post('pointwestmp-sit.com.ph/v1/customer/user/inquiryUserInfoByAccessToken', data)
     // .get('pointwestmp-sit.com.ph/v1/oauths/applyToken', data, config)
     .then(function (response) {
-      console.log(response.data);
+      // console.log(response.data);
+      console.log(response);
       res.status(200).json({
         authCode: req.params.authId,
         response: response,
-        // games: response.data,
       });
     })
     .catch(function (error) {
       console.log(error);
+      // console.log('error');
     });
 });
 
