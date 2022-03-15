@@ -36,6 +36,7 @@ app.get('/auth/:authId', (req, res) => {
       res.status(200).json({
         authCode: req.params.authId,
         response: response,
+        stausCode: 200,
       });
     })
     .catch(function (error) {
@@ -43,6 +44,7 @@ app.get('/auth/:authId', (req, res) => {
       res.status(200).json({
         authCode: req.params.authId,
         response: error,
+        stausCode: 204,
       });
       // console.log('error');
     });
