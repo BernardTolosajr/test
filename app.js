@@ -10,6 +10,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/auth/:authId', (req, res) => {
+  console.log('wtf');
   // let config = {
   //   headers: {
   //     'Client-Id': 2022030313304100083286,
@@ -39,7 +40,7 @@ app.get('/auth/:authId', (req, res) => {
     })
     .catch(function (error) {
       console.log(error);
-      res.status(400).json({
+      res.status(200).json({
         authCode: req.params.authId,
         response: error,
       });
