@@ -27,8 +27,8 @@ app.get('/', (req, res) => {
 app.get('/auth/:authId', async (req, res) => {
   //Create signature here
   // const HTTP_URI = '/v1/oauths/applyToken';
+  const HTTP_METHOD = 'post';
   const HTTP_URI = 'https://pointwestmp-sit.com.ph/v1/oauths/applyToken';
-  const HTTP_METHOD = 'POST';
   const CLIENT_ID = '2022030313304100083286';
   const REQUEST_TIME = new Date().toISOString();
   const HTTP_BODY = {
@@ -38,11 +38,10 @@ app.get('/auth/:authId', async (req, res) => {
   };
 
   const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI}\n${CLIENT_ID} ${REQUEST_TIME} ${JSON.stringify(HTTP_BODY)}`;
-  console.log('CONTENT_TO_BE_SIGNED', CONTENT_TO_BE_SIGNED);
+  // console.log('CONTENT_TO_BE_SIGNED', CONTENT_TO_BE_SIGNED);
 
   jwt.sign(CONTENT_TO_BE_SIGNED, privateKey, { algorithm: 'RS256' }, function (err, token) {
     // For testing try public and private key
-
     if (err) {
       return res.status(500).json({
         status: 'fail',
@@ -58,22 +57,14 @@ app.get('/auth/:authId', async (req, res) => {
       signature: `algorithm=RSA256,keyVersion=1,signature=${signatureToBase64}`,
     };
 
-    let v1Data = {
+    let data = {
       referenceClientId: '2022030313304100083286',
       grantType: 'AUTHORIZATION_CODE',
       authCode: req.params.authId,
     };
 
-    let v2Data = {
-      authClientId: '2022030313304100083286',
-      grantType: 'AUTHORIZATION_CODE',
-      customerBelongsTo: 'GCASH',
-      authCode: req.params.authId,
-    };
-
     axios
-      .post('https://pointwestmp-sit.com.ph/v1/oauths/applyToken', v1Data, { headers }) // v1
-      // .post('https://pointwestmp-sit.com.ph/v2/oauths/applyToken', v2Data, { headers }) //v2
+      .post('https://pointwestmp-sit.com.ph/v1/oauths/applyToken', data, { headers }) // v1
       .then((response) => {
         console.log('response', response);
 
@@ -84,7 +75,7 @@ app.get('/auth/:authId', async (req, res) => {
           headers: {
             ...headers,
           },
-          data: v1Data, // v1Data or v2Data
+          data,
         });
       })
       .catch((error) => {
@@ -97,7 +88,7 @@ app.get('/auth/:authId', async (req, res) => {
           headers: {
             ...headers,
           },
-          data: v1Data, // v1Data or v2Data
+          data,
         });
       });
   });
