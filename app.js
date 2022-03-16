@@ -74,27 +74,31 @@ app.get('/auth/:authId', async (req, res) => {
       .post('https://pointwestmp-sit.com.ph/v1/oauths/applyToken', v1Data, { headers }) // v1
       // .post('https://pointwestmp-sit.com.ph/v2/oauths/applyToken', v2Data, { headers }) //v2
       .then((response) => {
-        console.log('response gcash server');
         console.log('response', response);
 
         return res.status(200).json({
           status: 'success',
           CONTENT_TO_BE_SIGNED,
-          signatureToBase64,
-          signature: token,
+          headers: {
+            signatureToBase64,
+            signature: token,
+            ...headers,
+          },
           data: v1Data, // v1Data or v2Data
         });
       })
       .catch((error) => {
-        console.log('error gcash server');
         console.log('error', error.message);
 
         return res.status(200).json({
           status: 'fail',
           error: error.message,
           CONTENT_TO_BE_SIGNED,
-          signatureToBase64,
-          signature: token,
+          headers: {
+            signatureToBase64,
+            signature: token,
+            ...headers,
+          },
           data: v1Data, // v1Data or v2Data
         });
       });
