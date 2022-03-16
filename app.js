@@ -77,7 +77,7 @@ app.get('/auth/:authId', async (req, res) => {
         console.log('response gcash server');
         console.log('response', response);
 
-        res.status(200).json({
+        return res.status(200).json({
           status: 'success',
           CONTENT_TO_BE_SIGNED,
           signatureToBase64,
@@ -89,7 +89,7 @@ app.get('/auth/:authId', async (req, res) => {
         console.log('error gcash server');
         console.log('error', error.message);
 
-        res.status(500).json({
+        return res.status(500).json({
           status: 'fail',
           CONTENT_TO_BE_SIGNED,
           signatureToBase64,
