@@ -1,7 +1,6 @@
 const express = require('express');
 const axios = require('axios').default;
 const https = require('https');
-const rsa = require('node-rsa');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 
@@ -26,9 +25,9 @@ app.get('/', (req, res) => {
 // Auth API
 app.get('/auth/:authId', async (req, res) => {
   //Create signature here
-  // const HTTP_URI = '/v1/oauths/applyToken';
   const HTTP_METHOD = 'POST';
-  const HTTP_URI = 'https://pointwestmp-sit.com.ph/v1/oauths/applyToken';
+  // const HTTP_URI = '/v1/oauths/applyToken';
+  const HTTP_URI = 'https://pointwestmp-sit.com.ph/api/v1/oauths/applyToken';
   const CLIENT_ID = '2022030313304100083286';
   const REQUEST_TIME = new Date().toISOString();
   const HTTP_BODY = {
@@ -47,11 +46,11 @@ app.get('/auth/:authId', async (req, res) => {
         error: err.message,
       });
     }
-    const signatureToBase64 = new Buffer(token).toString('base64');
-    // const signatureToBase64ver2 = Buffer.from(token).toString('base64');
+    // const signatureToBase64 = new Buffer(token).toString('base64');
+    const signatureToBase64 = Buffer.from(token).toString('base64');
 
     const headers = {
-      'Content-Type': 'application/json;charset=UTF-8',
+      'Content-Type': 'application/json;charset=UTF-8;',
       'Client-Id': '2022030313304100083286',
       'Request-Time': new Date().toISOString(),
       signature: `algorithm=RSA256,keyVersion=1,signature=${signatureToBase64}`,
@@ -65,12 +64,13 @@ app.get('/auth/:authId', async (req, res) => {
     };
 
     axios
-      .post('https://pointwestmp-sit.com.ph/v1/oauths/applyToken', data, { headers }) // v1
+      .post('https://pointwestmp-sit.com.ph/api/v1/oauths/applyToken', data, { headers }) // v1
       .then((response) => {
         console.log('response', response);
 
         return res.status(200).json({
           status: 'success',
+
           response,
           CONTENT_TO_BE_SIGNED,
           headers: {
