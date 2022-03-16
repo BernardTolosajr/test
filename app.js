@@ -91,6 +91,7 @@ app.get('/auth/:authId', async (req, res) => {
 
         return res.status(500).json({
           status: 'fail',
+          error: error.message,
           CONTENT_TO_BE_SIGNED,
           signatureToBase64,
           signature: token,
