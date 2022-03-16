@@ -3,17 +3,14 @@ const axios = require('axios').default;
 const https = require('https');
 const rsa = require('node-rsa');
 const fs = require('fs');
-const sha256 = require('js-sha256');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 // Read the key files
-const public = fs.readFileSync('./keys/client_public_key_php_dotnet.pem', 'utf-8'); //Try public or private
-const private = fs.readFileSync('./keys/client_private_key_php_dotnet.pem', 'utf-8'); //Try public or private
-
-// console.log('private key', typeof private);
-// console.log('public key', typeof public);
+const publicKey = fs.readFileSync('./keys/client_public_key_php_dotnet.pem', 'utf-8'); //Try public or private
+const privateKey = fs.readFileSync('./keys/client_private_key_php_dotnet.pem', 'utf-8'); //Try public or private
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -27,9 +24,9 @@ app.get('/', (req, res) => {
 });
 
 // Auth API
-app.get('/auth/:authId', (req, res) => {
+app.get('/auth/:authId', async (req, res) => {
   //Create signature here
-  const HTTP_URI = '/v1/authorizations/applyToken';
+  const HTTP_URI = '/v1/oauths/applyToken';
   const HTTP_METHOD = 'POST';
   const CLIENT_ID = '2022030313304100083286';
   const REQUEST_TIME = new Date().toISOString();
@@ -39,44 +36,74 @@ app.get('/auth/:authId', (req, res) => {
     authCode: req.params.authId,
   };
 
-  const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI} \n ${CLIENT_ID} ${REQUEST_TIME} ${JSON.stringify(HTTP_BODY)}`;
+  const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI}\n${CLIENT_ID} ${REQUEST_TIME} ${JSON.stringify(HTTP_BODY)}`;
   console.log('CONTENT_TO_BE_SIGNED', CONTENT_TO_BE_SIGNED);
 
-  const signature = sha256.hmac(public, CONTENT_TO_BE_SIGNED); // try public or pirvate
-  const signatureToBase64 = Buffer.from(signature).toString('base64');
+  jwt.sign(CONTENT_TO_BE_SIGNED, privateKey, { algorithm: 'RS256' }, function (err, token) {
+    // For testing try public and private key
 
-  console.log('signature', signature);
-  console.log('signatureToBase64', signatureToBase64);
+    if (err) {
+      return res.status(500).json({
+        status: 'fail',
+        error: err.message,
+      });
+    }
+    const signatureToBase64 = new Buffer(token).toString('base64');
 
-  const headers = {
-    'Content-Type': 'application/json; charset=UTF-8',
-    'Client-Id': '2022030313304100083286',
-    'Request-Time': new Date().toISOString(),
-    signature: `algorithm=RSA256,keyVersion=1,signature=${signatureToBase64}`,
-  };
+    const headers = {
+      'Content-Type': 'application/json',
+      'Client-Id': '2022030313304100083286',
+      'Request-Time': new Date().toISOString(),
+      signature: `algorithm=RSA256,keyVersion=1,signature=${signatureToBase64}`,
+    };
 
-  let data = {
-    referenceClientId: '2022030313304100083286',
-    grantType: 'AUTHORIZATION_CODE',
-    authCode: req.params.authId,
-  };
+    let config = {
+      headers: {
+        header1: value,
+      },
+    };
 
-  res.status(200).json({
-    CONTENT_TO_BE_SIGNED,
-    signature: signatureToBase64,
-    data,
+    let v1Data = {
+      referenceClientId: '2022030313304100083286',
+      grantType: 'AUTHORIZATION_CODE',
+      authCode: req.params.authId,
+    };
+
+    let v2Data = {
+      authClientId: '2022030313304100083286',
+      grantType: 'AUTHORIZATION_CODE',
+      customerBelongsTo: 'GCASH',
+      authCode: req.params.authId,
+    };
+
+    axios
+      .post('https://pointwestmp-sit.com.ph/v1/oauths/applyToken', v1Data, { headers }) // v1
+      // .post('https://pointwestmp-sit.com.ph/v2/oauths/applyToken', v2Data, { headers }) //v2
+      .then((response) => {
+        console.log('response gcash server');
+        console.log('response', response);
+
+        res.status(200).json({
+          status: 'success',
+          CONTENT_TO_BE_SIGNED,
+          signatureToBase64,
+          signature: token,
+          data: v1Data, // v1Data or v2Data
+        });
+      })
+      .catch((error) => {
+        console.log('error gcash server');
+        console.log('error', error.message);
+
+        res.status(500).json({
+          status: 'fail',
+          CONTENT_TO_BE_SIGNED,
+          signatureToBase64,
+          signature: token,
+          data: v1Data, // v1Data or v2Data
+        });
+      });
   });
-
-  axios
-    .post('pointwestmp-sit.com.ph/v1/oauths/applyToken', data, { headers })
-    .then((response) => {
-      console.log('response', response);
-    })
-    .catch((error) => {
-      // console.log('error', error);
-    });
-
-  // console.log('headers', headers);
 });
 
 const PORT = process.env.PORT || 3000;
@@ -84,3 +111,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Listening to port 3000');
 });
+
+// const signature = sha256.hmac(publicKey, CONTENT_TO_BE_SIGNED); // try public or pirvate
+// const signatureToBase64 = Buffer.from(signature).toString('base64');
