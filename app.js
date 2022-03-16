@@ -85,7 +85,7 @@ app.get('/auth/:authId', async (req, res) => {
 
         return res.status(200).json({
           status: 'fail',
-          error: error.message,
+          error: `GCASH SERVER ERROR: ${error.message}`,
           CONTENT_TO_BE_SIGNED,
           headers: {
             ...headers,
