@@ -27,7 +27,7 @@ app.get('/', (req, res) => {
 app.get('/auth/:authId', async (req, res) => {
   //Create signature here
   // const HTTP_URI = '/v1/oauths/applyToken';
-  const HTTP_METHOD = 'post';
+  const HTTP_METHOD = 'POST';
   const HTTP_URI = 'https://pointwestmp-sit.com.ph/v1/oauths/applyToken';
   const CLIENT_ID = '2022030313304100083286';
   const REQUEST_TIME = new Date().toISOString();
@@ -38,7 +38,7 @@ app.get('/auth/:authId', async (req, res) => {
   };
 
   const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI}
-  ${CLIENT_ID} ${REQUEST_TIME} ${JSON.stringify(HTTP_BODY)}`;
+  ${CLIENT_ID}.${REQUEST_TIME}.${JSON.stringify(HTTP_BODY)}`;
 
   jwt.sign(CONTENT_TO_BE_SIGNED, privateKey, { algorithm: 'RS256' }, function (err, token) {
     // For testing try public and private key
