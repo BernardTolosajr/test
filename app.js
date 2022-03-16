@@ -27,7 +27,7 @@ app.get('/auth/:authId', async (req, res) => {
   //Create signature here
   const HTTP_METHOD = 'POST';
   // const HTTP_URI = '/v1/oauths/applyToken';
-  const HTTP_URI = 'https://pointwestmp-sit.com.ph/api/v1/oauths/applyToken';
+  const HTTP_URI = 'https://api-sit.saas.mynt.xyz/v1/oauths/applyToken.htm';
   const CLIENT_ID = '2022030313304100083286';
   const REQUEST_TIME = new Date().toISOString();
   const HTTP_BODY = {
@@ -64,7 +64,7 @@ app.get('/auth/:authId', async (req, res) => {
     };
 
     axios
-      .post('https://pointwestmp-sit.com.ph/api/v1/oauths/applyToken', data, { headers }) // v1
+      .post('api-sit.saas.mynt.xyz/v1/oauths/applyToken.htm', data, { headers }) // v1
       .then((response) => {
         console.log('response', response);
 
