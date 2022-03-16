@@ -37,8 +37,8 @@ app.get('/auth/:authId', async (req, res) => {
     authCode: req.params.authId,
   };
 
-  const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI}\n${CLIENT_ID} ${REQUEST_TIME} ${JSON.stringify(HTTP_BODY)}`;
-  // console.log('CONTENT_TO_BE_SIGNED', CONTENT_TO_BE_SIGNED);
+  const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI}
+  ${CLIENT_ID} ${REQUEST_TIME} ${JSON.stringify(HTTP_BODY)}`;
 
   jwt.sign(CONTENT_TO_BE_SIGNED, privateKey, { algorithm: 'RS256' }, function (err, token) {
     // For testing try public and private key
@@ -49,6 +49,7 @@ app.get('/auth/:authId', async (req, res) => {
       });
     }
     const signatureToBase64 = new Buffer(token).toString('base64');
+    // const signatureToBase64ver2 = Buffer.from(token).toString('base64');
 
     const headers = {
       'Content-Type': 'application/json;charset=UTF-8',
@@ -61,6 +62,7 @@ app.get('/auth/:authId', async (req, res) => {
       referenceClientId: '2022030313304100083286',
       grantType: 'AUTHORIZATION_CODE',
       authCode: req.params.authId,
+      extendInfo: JSON.stringify({ customerBelongsTo: 'GCASH' }),
     };
 
     axios
@@ -75,7 +77,7 @@ app.get('/auth/:authId', async (req, res) => {
           headers: {
             ...headers,
           },
-          data,
+          HTTP_BODY: data,
         });
       })
       .catch((error) => {
@@ -88,7 +90,7 @@ app.get('/auth/:authId', async (req, res) => {
           headers: {
             ...headers,
           },
-          data,
+          HTTP_BODY: data,
         });
       });
   });
