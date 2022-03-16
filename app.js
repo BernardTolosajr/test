@@ -78,6 +78,7 @@ app.get('/auth/:authId', async (req, res) => {
 
         return res.status(200).json({
           status: 'success',
+          response,
           CONTENT_TO_BE_SIGNED,
           headers: {
             signatureToBase64,
