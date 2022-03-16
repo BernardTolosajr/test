@@ -37,8 +37,7 @@ app.get('/auth/:authId', async (req, res) => {
     authCode: req.params.authId,
   };
 
-  const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI}
-  ${CLIENT_ID}.${REQUEST_TIME}.${JSON.stringify(HTTP_BODY)}`;
+  const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI}\n${CLIENT_ID}.${REQUEST_TIME}.${JSON.stringify(HTTP_BODY)}`;
 
   jwt.sign(CONTENT_TO_BE_SIGNED, privateKey, { algorithm: 'RS256' }, function (err, token) {
     // For testing try public and private key
