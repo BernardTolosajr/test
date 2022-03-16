@@ -26,7 +26,8 @@ app.get('/', (req, res) => {
 // Auth API
 app.get('/auth/:authId', async (req, res) => {
   //Create signature here
-  const HTTP_URI = '/v1/oauths/applyToken';
+  // const HTTP_URI = '/v1/oauths/applyToken';
+  const HTTP_URI = 'https://pointwestmp-sit.com.ph/v1/oauths/applyToken';
   const HTTP_METHOD = 'POST';
   const CLIENT_ID = '2022030313304100083286';
   const REQUEST_TIME = new Date().toISOString();
@@ -51,7 +52,7 @@ app.get('/auth/:authId', async (req, res) => {
     const signatureToBase64 = new Buffer(token).toString('base64');
 
     const headers = {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/json;charset=UTF-8',
       'Client-Id': '2022030313304100083286',
       'Request-Time': new Date().toISOString(),
       signature: `algorithm=RSA256,keyVersion=1,signature=${signatureToBase64}`,
@@ -81,8 +82,6 @@ app.get('/auth/:authId', async (req, res) => {
           response,
           CONTENT_TO_BE_SIGNED,
           headers: {
-            signatureToBase64,
-            signature: token,
             ...headers,
           },
           data: v1Data, // v1Data or v2Data
@@ -96,8 +95,6 @@ app.get('/auth/:authId', async (req, res) => {
           error: error.message,
           CONTENT_TO_BE_SIGNED,
           headers: {
-            signatureToBase64,
-            signature: token,
             ...headers,
           },
           data: v1Data, // v1Data or v2Data
