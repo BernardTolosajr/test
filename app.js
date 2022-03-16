@@ -24,10 +24,9 @@ app.get('/', (req, res) => {
 
 // Auth API
 app.get('/auth/:authId', async (req, res) => {
-  //Create signature here
   const HTTP_METHOD = 'POST';
-  // const HTTP_URI = '/v1/oauths/applyToken';
-  const HTTP_URI = 'https://api-sit.saas.mynt.xyz/v1/oauths/applyToken.htm';
+  const HTTP_URI = 'https://api-sit.saas.mynt.xyz/v1/authorizations/applyToken.htm';
+  // const HTTP_URI = '/v1/authorizations/applyToken';
   const CLIENT_ID = '2022030313304100083286';
   const REQUEST_TIME = new Date().toISOString();
   const HTTP_BODY = {
@@ -64,14 +63,11 @@ app.get('/auth/:authId', async (req, res) => {
     };
 
     axios
-      .post('api-sit.saas.mynt.xyz/v1/oauths/applyToken.htm', data, { headers }) // v1
+      .post('https://api-sit.saas.mynt.xyz/v1/authorizations/applyToken.htm', data, { headers }) // v1
       .then((response) => {
-        console.log('response', response);
-
         return res.status(200).json({
           status: 'success',
-
-          response,
+          response: response.data.result,
           CONTENT_TO_BE_SIGNED,
           headers: {
             ...headers,
@@ -80,11 +76,11 @@ app.get('/auth/:authId', async (req, res) => {
         });
       })
       .catch((error) => {
-        console.log('error', error.message);
-
-        return res.status(200).json({
+        console.log('error', error.data);
+        return res.status(500).json({
           status: 'fail',
           error: `GCASH SERVER ERROR: ${error.message}`,
+          errors: error,
           CONTENT_TO_BE_SIGNED,
           headers: {
             ...headers,
