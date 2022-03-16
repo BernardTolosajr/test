@@ -57,12 +57,6 @@ app.get('/auth/:authId', async (req, res) => {
       signature: `algorithm=RSA256,keyVersion=1,signature=${signatureToBase64}`,
     };
 
-    let config = {
-      headers: {
-        header1: value,
-      },
-    };
-
     let v1Data = {
       referenceClientId: '2022030313304100083286',
       grantType: 'AUTHORIZATION_CODE',
