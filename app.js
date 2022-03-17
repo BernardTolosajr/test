@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
   res.status(200).send('Hello server is running').end();
 });
 
-const delayedResponseTime = new Date(new Date().getTime() + 2 * 60000); //2019-04-04T12:08:56.253+05:30
+const delayedResponseTime = new Date(new Date().getTime() + 2 * 60000).toISOString(); //2019-04-04T12:08:56.253+05:30
 // Auth API
 app.get('/auth/:authId', async (req, res) => {
   const HTTP_METHOD = 'POST';
