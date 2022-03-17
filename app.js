@@ -38,6 +38,7 @@ app.get('/auth/:authId', async (req, res) => {
   };
 
   const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI}\n${CLIENT_ID}.${REQUEST_TIME}.${JSON.stringify(HTTP_BODY)}`;
+  console.log(CONTENT_TO_BE_SIGNED);
 
   jwt.sign(CONTENT_TO_BE_SIGNED, privateKey, { algorithm: 'RS256' }, function (err, token) {
     if (err) {
@@ -99,6 +100,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Listening to port 3000');
 });
-
-// const signature = sha256.hmac(publicKey, CONTENT_TO_BE_SIGNED); // try public or pirvate
-// const signatureToBase64 = Buffer.from(signature).toString('base64');
