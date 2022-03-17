@@ -3,6 +3,7 @@ const axios = require('axios').default;
 const https = require('https');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const { log } = require('console');
 
 const app = express();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -22,13 +23,14 @@ app.get('/', (req, res) => {
   res.status(200).send('Hello server is running').end();
 });
 
+const delayedResponseTime = new Date(new Date().getTime() + 2 * 60000); //2019-04-04T12:08:56.253+05:30
 // Auth API
 app.get('/auth/:authId', async (req, res) => {
   const HTTP_METHOD = 'POST';
   const HTTP_URI = 'https://api-sit.saas.mynt.xyz/v1/authorizations/applyToken.htm';
   // const HTTP_URI = '/v1/authorizations/applyToken';
   const CLIENT_ID = '2022030313304100083286';
-  const REQUEST_TIME = new Date().toISOString();
+  const REQUEST_TIME = delayedResponseTime;
   const HTTP_BODY = {
     referenceClientId: '2022030313304100083286',
     grantType: 'AUTHORIZATION_CODE',
@@ -38,7 +40,6 @@ app.get('/auth/:authId', async (req, res) => {
   const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI}\n${CLIENT_ID}.${REQUEST_TIME}.${JSON.stringify(HTTP_BODY)}`;
 
   jwt.sign(CONTENT_TO_BE_SIGNED, privateKey, { algorithm: 'RS256' }, function (err, token) {
-    // For testing try public and private key
     if (err) {
       return res.status(500).json({
         status: 'fail',
@@ -51,7 +52,7 @@ app.get('/auth/:authId', async (req, res) => {
     const headers = {
       'Content-Type': 'application/json;charset=UTF-8;',
       'Client-Id': '2022030313304100083286',
-      'Request-Time': new Date().toISOString(),
+      'Request-Time': new Date().toISOString(), // Add seconds delay based on the document
       signature: `algorithm=RSA256,keyVersion=1,signature=${signatureToBase64}`,
     };
 
@@ -69,6 +70,7 @@ app.get('/auth/:authId', async (req, res) => {
           status: 'success',
           response: response.data.result,
           CONTENT_TO_BE_SIGNED,
+          authCode: req.params.authId,
           headers: {
             ...headers,
           },
@@ -82,6 +84,7 @@ app.get('/auth/:authId', async (req, res) => {
           error: `GCASH SERVER ERROR: ${error.message}`,
           errors: error,
           CONTENT_TO_BE_SIGNED,
+          authCode: req.params.authId,
           headers: {
             ...headers,
           },
