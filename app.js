@@ -88,7 +88,7 @@ app.get('/auth/:authId', async (req, res) => {
       .then((response) => {
         const BODY2 = {
           accessToken: response.data.accessToken || "202203228xtJgyd7HXsrftcTE7SqLHRks12vtMd8MX07YHaV2xu0886400079501", 
-          // extendInfo: {customerBelongsTo:"GCASH"}
+          extendInfo: {customerBelongsTo:"GCASH"}
         }
 
         const headers2 = {
