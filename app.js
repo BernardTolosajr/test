@@ -3,7 +3,8 @@ const axios = require('axios').default;
 const https = require('https');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
-const { log } = require('console');
+const rs = require('jsrsasign'); //sample rsa-js library, you can use other or if you have your own rsa library
+const moment = require('moment'); //moment library
 
 const app = express();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -23,49 +24,62 @@ app.get('/', (req, res) => {
   res.status(200).send('Hello server is running').end();
 });
 
-const delayedResponseTime = new Date(new Date().getTime() + 2 * 60000).toISOString(); //2019-04-04T12:08:56.253+05:30
+const date = new Date();
+const currentTimestamp = moment(date).format('YYYY-MM-DDTHH:mm:ss.SSSZ')   
+
 // Auth API
 app.get('/auth/:authId', async (req, res) => {
   const HTTP_METHOD = 'POST';
-  const HTTP_URI = 'https://api-sit.saas.mynt.xyz/v1/authorizations/applyToken.htm';
-  // const HTTP_URI = '/v1/authorizations/applyToken';
+  const HTTP_URI = '/v1/authorizations/applyToken.htm';
   const CLIENT_ID = '2022030313304100083286';
-  const REQUEST_TIME = delayedResponseTime;
+  const REQUEST_TIME = currentTimestamp;
   const HTTP_BODY = {
     referenceClientId: '2022030313304100083286',
     grantType: 'AUTHORIZATION_CODE',
     authCode: req.params.authId,
+    extendInfo: {customerBelongsTo:"GCASH"}
   };
 
   const CONTENT_TO_BE_SIGNED = `${HTTP_METHOD} ${HTTP_URI}\n${CLIENT_ID}.${REQUEST_TIME}.${JSON.stringify(HTTP_BODY)}`;
   console.log(CONTENT_TO_BE_SIGNED);
 
-  jwt.sign(CONTENT_TO_BE_SIGNED, privateKey, { algorithm: 'RS256' }, function (err, token) {
-    if (err) {
-      return res.status(500).json({
-        status: 'fail',
-        error: err.message,
-      });
-    }
-    // const signatureToBase64 = new Buffer(token).toString('base64');
-    const signatureToBase64 = Buffer.from(token).toString('base64');
+    // let data = {
+    //   referenceClientId: '2022030313304100083286',
+    //   grantType: 'AUTHORIZATION_CODE',
+    //   authCode: req.params.authId,
+    //   extendInfo: JSON.stringify({ customerBelongsTo: 'GCASH' }),
+    // };
 
-    const headers = {
-      'Content-Type': 'application/json;charset=UTF-8;',
-      'Client-Id': '2022030313304100083286',
-      'Request-Time': new Date().toISOString(), // Add seconds delay based on the document
-      signature: `algorithm=RSA256,keyVersion=1,signature=${signatureToBase64}`,
-    };
+      // set RSA privateKey
+  const rsaPrivateKey = rs.KEYUTIL.getKey(privateKey, 'passwd');
 
-    let data = {
-      referenceClientId: '2022030313304100083286',
-      grantType: 'AUTHORIZATION_CODE',
-      authCode: req.params.authId,
-      extendInfo: JSON.stringify({ customerBelongsTo: 'GCASH' }),
-    };
+  // initialize
+  const sig = new rs.KJUR.crypto.Signature({alg: 'SHA256withRSA'});
+  
+  // initialize for signature generation
+  sig.init(rsaPrivateKey);
+  sig.updateString(CONTENT_TO_BE_SIGNED);
+  
+  // calculate signature
+  const sigValueHex = sig.sign();
+  console.log('sigValueHex: ' + sigValueHex)
+
+  const hex2b64Signature = rs.hex2b64(sigValueHex)
+  console.log('hex2b64Signature: ' + hex2b64Signature)
+  
+  const encodedSignature = encodeURIComponent(hex2b64Signature)
+  console.log('encodedSignature: ' + encodedSignature)
+
+  const headers = {
+    "content-type": "application/json; charset=UTF-8",
+    "Client-Id": CLIENT_ID,
+    "Request-Time": currentTimestamp,
+    "Signature": "algorithm=RSA256, keyVersion=2, signature=" + encodedSignature,
+  }
+
 
     axios
-      .post('https://api-sit.saas.mynt.xyz/v1/authorizations/applyToken.htm', data, { headers }) // v1
+      .post('https://api-sit.saas.mynt.xyz/v1/authorizations/applyToken.htm', HTTP_BODY, { headers }) // v1
       .then((response) => {
         return res.status(200).json({
           status: 'success',
@@ -75,7 +89,7 @@ app.get('/auth/:authId', async (req, res) => {
           headers: {
             ...headers,
           },
-          HTTP_BODY: data,
+          HTTP_BODY,
         });
       })
       .catch((error) => {
@@ -89,10 +103,10 @@ app.get('/auth/:authId', async (req, res) => {
           headers: {
             ...headers,
           },
-          HTTP_BODY: data,
+          HTTP_BODY,
         });
       });
-  });
+  // });
 });
 
 const PORT = process.env.PORT || 3000;
@@ -100,3 +114,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log('Listening to port 3000');
 });
+
