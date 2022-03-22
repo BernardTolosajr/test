@@ -83,7 +83,7 @@ app.get('/auth/:authId', async (req, res) => {
       .then((response) => {
         return res.status(200).json({
           status: 'success',
-          response: response.data.result,
+          response: response.data,
           CONTENT_TO_BE_SIGNED,
           authCode: req.params.authId,
           headers: {
