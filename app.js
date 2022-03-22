@@ -88,7 +88,7 @@ app.get('/auth/:authId', async (req, res) => {
       .then((response) => {
         const BODY2 = {
           accessToken: response.data.accessToken || "202203228xtJgyd7HXsrftcTE7SqLHRks12vtMd8MX07YHaV2xu0886400079501", 
-          extendInfo: {customerBelongsTo:"GCASH"}
+          // extendInfo: {customerBelongsTo:"GCASH"}
         }
 
         const headers2 = {
@@ -108,15 +108,15 @@ app.get('/auth/:authId', async (req, res) => {
 
           return res.status(200).json({
             status: 'success',
-            response: response.data,
-            authCode: req.params.authId,
+            // response: response.data,
+            // authCode: req.params.authId,
             // headers,
             userInquiry: test
           });
         })
 
 
-    
+
       })
       .catch((error) => {
         console.log('error', error.data);
