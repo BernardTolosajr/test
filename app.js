@@ -95,7 +95,7 @@ app.get('/auth/:authId', async (req, res) => {
           "content-type": "application/json; charset=UTF-8",
           "Client-Id": '2022030313304100083286',
           "Request-Time": currentTimestamp,
-          "Signature": getSignature('POST','/v1/customers/user/inquiryUserInfoByAccessToken.htm', '2022030313304100083286', BODY2),
+          "Signature": getSignature('POST','/v1/customer/user/inquiryUserInfoByAccessToken.htm', '2022030313304100083286', BODY2),
         }
 
         console.log("BODY2:", BODY2)
