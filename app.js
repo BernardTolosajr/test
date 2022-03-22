@@ -86,36 +86,37 @@ app.get('/auth/:authId', async (req, res) => {
     axios
       .post('https://api-sit.saas.mynt.xyz/v1/authorizations/applyToken.htm', body, { headers }) // v1
       .then((response) => {
-        // const BODY2 = {
-        //   accessToken: response.data.accessToken || "202203228xtJgyd7HXsrftcTE7SqLHRks12vtMd8MX07YHaV2xu0886400079501",
-        //   extendInfo: {customerBelongsTo:"GCASH"}
-        // }
+        const BODY2 = {
+          accessToken: response.data.accessToken || "202203228xtJgyd7HXsrftcTE7SqLHRks12vtMd8MX07YHaV2xu0886400079501", 
+          // extendInfo: {customerBelongsTo:"GCASH"}
+        }
 
-        // const headers2 = {
-        //   "content-type": "application/json; charset=UTF-8",
-        //   "Client-Id": '2022030313304100083286',
-        //   "Request-Time": currentTimestamp,
-        //   "Signature": getSignature('POST','/v1/customers/user/inquiryUserInfoByAccessToken.htm', '2022030313304100083286', BODY2 ),
-        // }
+        const headers2 = {
+          "content-type": "application/json; charset=UTF-8",
+          "Client-Id": '2022030313304100083286',
+          "Request-Time": currentTimestamp,
+          "Signature": getSignature('POST','/v1/customers/user/inquiryUserInfoByAccessToken.htm', '2022030313304100083286', BODY2),
+        }
 
-        // console.log("BODY2:", BODY2)
+        console.log("BODY2:", BODY2)
+        let test = null;
+        axios
+        .post('https://api-sit.saas.mynt.xyz/v1/customers/user/inquiryUserInfoByAccessToken.htm', BODY2, {headers: headers2} ) // v1
+        .then((zxc) => {
+          console.log(zxc.data)
+          test = zxc.data;
 
-        // axios
-        // .post('https://api-sit.saas.mynt.xyz/v1/customers/user/inquiryUserInfoByAccessToken.htm', BODY2, {headers: headers2} ) // v1
-        // .then((response) => {
-        //   console.log(response.data)
-        // })
+          return res.status(200).json({
+            status: 'success',
+            response: response.data,
+            authCode: req.params.authId,
+            headers,
+            userInquiry: test
+          });
+        })
 
 
-        return res.status(200).json({
-          status: 'success',
-          response: response.data,
-          authCode: req.params.authId,
-          headers: {
-            ...headers,
-          },
-          // userData
-        });
+    
       })
       .catch((error) => {
         console.log('error', error.data);
