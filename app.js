@@ -101,7 +101,7 @@ app.get('/auth/:authId', async (req, res) => {
         console.log("BODY2:", BODY2)
         let test = null;
         axios
-        .post('https://api-sit.saas.mynt.xyz/v1/customers/user/inquiryUserInfoByAccessToken.htm', BODY2, {headers: headers2} ) // v1
+        .post('https://api-sit.saas.mynt.xyz/v1/customer/user/inquiryUserInfoByAccessToken.htm', BODY2, {headers: headers2} ) // v1
         .then((zxc) => {
           console.log(zxc.data)
           test = zxc.data;
