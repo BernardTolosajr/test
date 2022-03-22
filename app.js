@@ -104,7 +104,7 @@ app.get('/auth/:authId', async (req, res) => {
         .post('https://api-sit.saas.mynt.xyz/v1/customers/user/inquiryUserInfoByAccessToken.htm', BODY2, {headers: headers2} ) // v1
         .then((zxc) => {
           console.log(zxc.data)
-          test = zxc.data;
+          test = zxc.data.userInfo;
 
           return res.status(200).json({
             status: 'success',
