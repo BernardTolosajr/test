@@ -110,7 +110,7 @@ app.get('/auth/:authId', async (req, res) => {
             status: 'success',
             response: response.data,
             authCode: req.params.authId,
-            headers,
+            // headers,
             userInquiry: test
           });
         })
